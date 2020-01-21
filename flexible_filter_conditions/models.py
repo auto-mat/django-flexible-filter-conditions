@@ -226,6 +226,7 @@ class TerminalCondition(models.Model):
         ('<=', u'≤'),
         ('containts', _(u'contains')),
         ('icontaints', _(u'contains (case insensitive)')),
+        ('isnull', _('variable is null (true or false)')),
     )
 
     variable = models.CharField(
@@ -248,7 +249,9 @@ class TerminalCondition(models.Model):
             "Value or variable on right-hand side. <br/>"
             "\naction: daily, new-user<br/>"
             "\nDateField: month_ago, one_day, one_week, two_weeks, one_month<br/>"
-            "\nBooleanField: True, False"),
+            "\nBooleanField: True, False<br/>"
+            "\nBlank value: None or Blank",
+        ),
         max_length=50,
         blank=True,
         null=True,
@@ -273,7 +276,7 @@ class TerminalCondition(models.Model):
                     return "action"
 
     def get_val(self, spec):
-        if '.' in spec:
+        if spec and '.' in spec:
             variable, value = spec.split('.')
         else:
             variable = spec
@@ -289,14 +292,15 @@ class TerminalCondition(models.Model):
             'days_ago': lambda value: datetime.datetime.now() - datetime.timedelta(days=int(value)),
             'true': True,
             'false': False,
-            'None': None,
+            'none': None,
+            'blank': '',
         }
-        if variable in spec_dict:
-            expression = spec_dict[variable]
+        if variable and variable.lower() in spec_dict:
+            expression = spec_dict[variable.lower()]
             if hasattr(expression, "__call__"):  # is function
-                return spec_dict[variable](value)
+                return expression(value)
             else:
-                return spec_dict[variable]
+                return expression
         else:
             try:
                 return int(spec)
@@ -316,6 +320,7 @@ class TerminalCondition(models.Model):
             'icontains': "__icontains",
             '<=': "__lte",
             '>=': "__gte",
+            'isnull': "__isnull",
         }
         return join_querystring + operation_map[operation]
 
