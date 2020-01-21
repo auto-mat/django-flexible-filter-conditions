@@ -1,6 +1,6 @@
-=============================
+=================================
 Django flexible filter conditions
-=============================
+=================================
 
 .. image:: https://badge.fury.io/py/django-flexible-filter-conditions.svg
     :target: https://badge.fury.io/py/django-flexible-filter-conditions
