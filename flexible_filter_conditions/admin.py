@@ -35,9 +35,9 @@ for i in range(inline_depth):
 ConditionInline = inlines[inline_depth - 1]
 
 
-@admin.register(TerminalCondition)
-class TerminalConditionAdmin(nested_admin.NestedModelAdmin):
-    list_display = ('variable', 'operation', 'value', 'condition')
+# @admin.register(TerminalCondition)
+# class TerminalConditionAdmin(nested_admin.NestedModelAdmin):
+#     list_display = ('variable', 'operation', 'value', 'condition')
 
 
 @admin.register(NamedCondition)
