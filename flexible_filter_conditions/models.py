@@ -269,7 +269,7 @@ class TerminalCondition(models.Model):
                 model = getattr(importlib.import_module(model_dir), model_name)
                 field = model._meta.get_field(field_path)
                 return getattr(field, 'help_text', getattr(field, 'verbose_name', field))
-            except (NameError, ValueError):
+            except (NameError, ValueError, KeyError):
                 try:
                     return eval(self.variable).__doc__
                 except NameError:
