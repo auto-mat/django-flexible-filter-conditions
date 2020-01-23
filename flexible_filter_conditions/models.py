@@ -248,9 +248,9 @@ class TerminalCondition(models.Model):
         help_text=_(
             "Value or variable on right-hand side. <br/>"
             "\naction: daily, new-user<br/>"
-            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month<br/>"
+            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month, datetime.2010-01-01 00:00<br/>"
             "\nBooleanField: True, False<br/>"
-            "\nBlank value: None or Blank",
+            "\nfor blank value: None or Blank",
         ),
         max_length=50,
         blank=True,
