@@ -94,6 +94,11 @@ class NamedCondition(models.Model):
             condition_strings.append(condition.condition_string())
         return ", ".join(condition_strings)
 
+    def filter_queryset(self, queryset, action=None):
+            for cond in self.conditions.all():
+                queryset = queryset.filter(cond.get_query(action))
+            return queryset.distinct()
+
     def __str__(self):
         return str(self.name)
 
@@ -351,9 +356,3 @@ class TerminalCondition(models.Model):
 
     def __str__(self):
         return "%s %s %s" % (self.variable, self.operation, self.value)
-
-
-def filter_by_condition(queryset, named_cond):
-    for cond in named_cond.conditions.all():
-        queryset = queryset.filter(cond.get_query())
-    return queryset.distinct()

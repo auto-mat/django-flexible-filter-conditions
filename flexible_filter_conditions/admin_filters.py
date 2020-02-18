@@ -1,7 +1,6 @@
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext as _
 
-from . import models
 from .models import NamedCondition
 
 
@@ -19,7 +18,7 @@ class UserConditionFilter(SimpleListFilter):
             return queryset
         cond = NamedCondition.objects.filter(id=self.value())[0]
 
-        return models.filter_by_condition(queryset, cond)
+        return cond.filter_queryset(queryset)
 
 
 class UserConditionFilter1(UserConditionFilter):
