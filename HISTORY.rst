@@ -3,7 +3,7 @@
 History
 -------
 
-0.4.0 (2020-xx-xx)
+0.4.0 (2020-02-18)
 ++++++++++++++++++
 
 * added support for new operators: in, list, date
