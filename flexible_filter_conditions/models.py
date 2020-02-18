@@ -227,6 +227,7 @@ class TerminalCondition(models.Model):
         ('containts', _(u'contains')),
         ('icontaints', _(u'contains (case insensitive)')),
         ('isnull', _('variable is null (true or false)')),
+        ('in', _('in list (e.g. list.3,44)')),
     )
 
     variable = models.CharField(
@@ -248,7 +249,7 @@ class TerminalCondition(models.Model):
         help_text=_(
             "Value or variable on right-hand side. <br/>"
             "\naction: daily, new-user<br/>"
-            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month, datetime.2010-01-01 00:00<br/>"
+            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month, datetime.2010-01-01 00:00, date.2010-01-01<br/>"
             "\nBooleanField: True, False<br/>"
             "\nfor blank value: None or Blank",
         ),
@@ -287,9 +288,11 @@ class TerminalCondition(models.Model):
             'one_week': datetime.timedelta(days=7),
             'two_weeks': datetime.timedelta(days=14),
             'one_month': datetime.timedelta(days=31),
+            'date': lambda value: datetime.datetime.strptime(value, '%Y-%m-%d'),
             'datetime': lambda value: datetime.datetime.strptime(value, '%Y-%m-%d %H:%M'),
             'timedelta': lambda value: datetime.timedelta(days=int(value)),
             'days_ago': lambda value: datetime.datetime.now() - datetime.timedelta(days=int(value)),
+            'list': lambda value: value.split(','),
             'true': True,
             'false': False,
             'none': None,
@@ -321,6 +324,7 @@ class TerminalCondition(models.Model):
             '<=': "__lte",
             '>=': "__gte",
             'isnull': "__isnull",
+            'in': "__in",
         }
         return join_querystring + operation_map[operation]
 

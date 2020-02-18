@@ -3,6 +3,11 @@
 History
 -------
 
+0.4.0 (2020-xx-xx)
+++++++++++++++++++
+
+* added support for new operators: in, list, date
+
 0.3.0 (2020-01-23)
 ++++++++++++++++++
 
