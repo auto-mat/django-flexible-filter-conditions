@@ -50,7 +50,8 @@ class TestConditionString(TestCase):
         t = mommy.make(
             "flexible_filter_conditions.Condition",
             named_condition__name="Foo condition",
-            operation="nor",
+            operation="or",
+            negate=True,
         )
         self.assertEqual(t.condition_string(), "not(())")
 
@@ -59,8 +60,9 @@ class TestConditionString(TestCase):
         t = mommy.make(
             "flexible_filter_conditions.Condition",
             named_condition__name="Foo condition",
-            operation="nor",
+            operation="or",
+            negate=True,
         )
         mommy.make("flexible_filter_conditions.Condition", operation="and", conds=t)
-        mommy.make("flexible_filter_conditions.Condition", operation="nor", conds=t)
+        mommy.make("flexible_filter_conditions.Condition", operation="or", negate=True, conds=t)
         self.assertEqual(t.condition_string(), "not((() or not(())))")

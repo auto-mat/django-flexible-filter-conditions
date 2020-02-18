@@ -89,7 +89,10 @@ class NamedCondition(models.Model):
     )
 
     def condition_string(self):
-        return self.condition.condition_string()
+        condition_strings = []
+        for condition in self.conditions.all():
+            condition_strings.append(condition.condition_string())
+        return ", ".join(condition_strings)
 
     def __str__(self):
         return str(self.name)
@@ -128,10 +131,14 @@ class Condition(models.Model):
     OPERATORS = (
         ('and', _(u'and')),
         ('or', _(u'or')),
-        ('nor', _(u'nor')),
+        ('xor', _(u'xor (one or the other)')),
     )
 
     # One of variable or conds must be non-null
+    negate = models.BooleanField(
+        verbose_name=_("Negate"),
+        default=False,
+    )
     operation = models.CharField(
         verbose_name=_("Operation"),
         choices=OPERATORS,
@@ -146,9 +153,9 @@ class Condition(models.Model):
         blank=True,
         null=True,
     )
-    named_condition = models.OneToOneField(
+    named_condition = models.ForeignKey(
         'NamedCondition',
-        related_name='condition',
+        related_name='conditions',
         null=True,
         blank=True,
         on_delete=models.CASCADE,
@@ -158,7 +165,7 @@ class Condition(models.Model):
         operation_dict = {
             'and': lambda x, y: x & y,
             'or': lambda x, y: x | y,
-            'nor': lambda x, y: x | y,
+            'xor': lambda x, y: (~x & y) | (x & ~y),
         }
         ret_cond = None
         if self.conds_rel:
@@ -173,7 +180,7 @@ class Condition(models.Model):
             else:
                 ret_cond = tcond.get_query(action)
 
-        if self.operation == 'nor':
+        if self.negate:
             return ~(ret_cond)
         else:
             return ret_cond
@@ -181,12 +188,10 @@ class Condition(models.Model):
     def condition_string(self):
         prefix = ""
         sufix = ""
-        if self.operation == 'nor':
+        if self.negate:
             prefix = "not("
             sufix = ")"
-            op_string = " or "
-        else:
-            op_string = " %s " % self.operation
+        op_string = " %s " % self.operation
 
         condition_list = [condition.condition_string() for condition in self.conds_rel.all()]
         terminalcondition_list = [str(condition) for condition in self.terminalcondition_set.all()]
@@ -227,7 +232,7 @@ class TerminalCondition(models.Model):
         ('containts', _(u'contains')),
         ('icontaints', _(u'contains (case insensitive)')),
         ('isnull', _('variable is null (true or false)')),
-        ('in', _('in list (e.g. list.3,44)')),
+        ('in', _('in list variable type (e.g. list.3,44)')),
     )
 
     variable = models.CharField(
@@ -249,7 +254,8 @@ class TerminalCondition(models.Model):
         help_text=_(
             "Value or variable on right-hand side. <br/>"
             "\naction: daily, new-user<br/>"
-            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month, datetime.2010-01-01 00:00, date.2010-01-01<br/>"
+            "\nDateField: month_ago, one_day, one_week, two_weeks, one_month,"
+            " datetime.2010-01-01 00:00, date.2010-01-01, list.3,5<br/>"
             "\nBooleanField: True, False<br/>"
             "\nfor blank value: None or Blank",
         ),
@@ -347,5 +353,7 @@ class TerminalCondition(models.Model):
         return "%s %s %s" % (self.variable, self.operation, self.value)
 
 
-def filter_by_condition(queryset, cond):
-    return queryset.filter(cond.condition.get_query()).distinct()
+def filter_by_condition(queryset, named_cond):
+    for cond in named_cond.conditions.all():
+        queryset = queryset.filter(cond.get_query())
+    return queryset.distinct()

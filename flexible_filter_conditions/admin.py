@@ -25,7 +25,7 @@ for i in range(inline_depth):
             (nested_admin.NestedTabularInline,),
             {
                 'model': Condition,
-                'fields': ('operation',),
+                'fields': ('negate', 'operation',),
                 'inlines': inline_classes,
                 'extra': 0,
 

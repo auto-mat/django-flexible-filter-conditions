@@ -240,7 +240,7 @@ class ConditionsTests(BaseTestCase):
 
     def test_multiple_combined_conditions(self):
         c = mommy.make('NamedCondition')
-        c2 = mommy.make('Condition', operation="nor", named_condition=c)
+        c2 = mommy.make('Condition', operation="or", negate=True, named_condition=c)
         c1 = mommy.make('Condition', operation="and", conds=c2)
         TerminalCondition.objects.create(
             variable="User.days_ago_condition",
@@ -270,9 +270,9 @@ class ConditionsTests(BaseTestCase):
             (~Q(days_ago_condition=datetime.datetime(2009, 12, 26, 0, 0)) & Q(time_condition__gte=datetime.timedelta(5))) |
             Q(int_condition=4) | Q(int_condition__lte=5)
         )
-        self.assertQueryEquals(c.condition.get_query(), test_query)
+        self.assertQueryEquals(c.conditions.first().get_query(), test_query)
         self.assertQueryEquals(
-            c.condition.condition_string(),
+            c.condition_string(),
             "not(((User.days_ago_condition != days_ago.6 and User.time_condition >= timedelta.5) "
             "or User.int_condition = 4 or User.int_condition <= 5))",
         )

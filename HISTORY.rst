@@ -7,6 +7,11 @@ History
 ++++++++++++++++++
 
 * added support for new operators: in, list, date
+* mutlipe conditions in one named comdition can be added to support
+  subsequent filters
+* add xor operator
+* add negate to condtition (and remove nor)
+
 
 0.3.0 (2020-01-23)
 ++++++++++++++++++
