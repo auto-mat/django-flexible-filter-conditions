@@ -40,7 +40,7 @@ class TestVariableDescription(TestCase):
             variable="TestModel.test_field",
             condition__named_condition__name="Foo condition",
         )
-        self.assertEqual( t.variable_description(), "Foo help_text")
+        self.assertEqual(t.variable_description(), "Foo help_text")
 
     def test_action(self):
         """ Test actions """
@@ -128,7 +128,7 @@ class ConditionsTests(BaseTestCase):
     """ Test conditions infrastructure and conditions in fixtures """
     maxDiff = None
 
-    def test_date_condition(self):
+    def test_datetime_condition(self):
         c = Condition.objects.create(operation="and", named_condition=mommy.make("NamedCondition"))
         TerminalCondition.objects.create(
             variable="User.date_condition",
@@ -138,6 +138,17 @@ class ConditionsTests(BaseTestCase):
         )
         self.assertQueryEquals(c.get_query(), Q(date_condition__gt=datetime.datetime(2010, 9, 24, 0, 0)))
         self.assertQueryEquals(c.condition_string(), "(User.date_condition > datetime.2010-09-24 00:00)")
+
+    def test_date_condition(self):
+        c = Condition.objects.create(operation="and", named_condition=mommy.make("NamedCondition"))
+        TerminalCondition.objects.create(
+            variable="User.date_condition",
+            value="date.2010-09-24",
+            operation=">",
+            condition=c,
+        )
+        self.assertQueryEquals(c.get_query(), Q(date_condition__gt=datetime.datetime(2010, 9, 24, 0, 0)))
+        self.assertQueryEquals(c.condition_string(), "(User.date_condition > date.2010-09-24)")
 
     def test_boolean_condition(self):
         c = Condition.objects.create(operation="or", named_condition=mommy.make("NamedCondition"))
@@ -149,6 +160,17 @@ class ConditionsTests(BaseTestCase):
         )
         self.assertQueryEquals(c.get_query(), Q(boolean_condition=True))
         self.assertQueryEquals(c.condition_string(), "(User.boolean_condition = true)")
+
+    def test_list_condition(self):
+        c = Condition.objects.create(operation="or", named_condition=mommy.make("NamedCondition"))
+        TerminalCondition.objects.create(
+            variable="User.boolean_condition",
+            value="list.3,4",
+            operation="in",
+            condition=c,
+        )
+        self.assertQueryEquals(c.get_query(), Q(boolean_condition__in=['3', '4']))
+        self.assertQueryEquals(c.condition_string(), "(User.boolean_condition in list.3,4)")
 
     def test_time_condition(self):
         c = Condition.objects.create(operation="or", named_condition=mommy.make("NamedCondition"))

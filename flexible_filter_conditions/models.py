@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class ConditionValues(object):
-    """Iterator that returns values available for Klub Conditions
+    """Iterator that returns values available for Conditions
 
     Returns tuples (val, val) where val is a string of the form
     model.cid where model is the name of the model in lower case
@@ -234,8 +234,8 @@ class TerminalCondition(models.Model):
         ('<', '<'),
         ('>=', '≥'),
         ('<=', '≤'),
-        ('containts', _(u'contains')),
-        ('icontaints', _(u'contains (case insensitive)')),
+        ('contains', _(u'contains')),
+        ('icontains', _(u'contains (case insensitive)')),
         ('isnull', _('variable is null (true or false)')),
         ('in', _('in list variable type (e.g. list.3,44)')),
     )

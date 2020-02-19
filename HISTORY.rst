@@ -3,6 +3,13 @@
 History
 -------
 
+0.5.0 (2020-02-19)
+++++++++++++++++++
+
+* refactor: remove filter_by_condition(), make it NamedCondition class method filter_by_query()
+* fix contains operator
+* add more testing
+
 0.4.0 (2020-02-18)
 ++++++++++++++++++
 
