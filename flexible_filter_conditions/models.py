@@ -244,7 +244,7 @@ class TerminalCondition(models.Model):
         verbose_name=_("Variable"),
         choices=ConditionValues(),
         help_text=_("Value or variable on left-hand side"),
-        max_length=50,
+        max_length=120,
         blank=True,
         null=True,
     )
